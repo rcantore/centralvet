@@ -1,5 +1,6 @@
 package com.centralvet.core.controllers;
 
+import com.centralvet.core.entities.Clinic;
 import com.centralvet.core.entities.Customer;
 import com.centralvet.core.entities.Pet;
 import com.centralvet.core.entities.repositories.ClinicRepository;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -28,6 +30,21 @@ public class CustomerController {
 
     @Autowired
     PetRepository petRepository;
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public ClinicServiceResponse getCustomers() {
+        ClinicServiceResponse clinicServiceResponse = new ClinicServiceResponse();
+        clinicServiceResponse.setMessage("successfully");
+        clinicServiceResponse.setStatus("OK");
+
+        List<Customer> customers = (List<Customer>) customerRepository.findAll();
+
+        //FIXME use getter
+        clinicServiceResponse.setCustomers(customers);
+
+        return clinicServiceResponse;
+    }
 
     @POST
     @Path("{id}/pets")
@@ -61,4 +78,29 @@ public class CustomerController {
         return Response.status(HttpStatus.OK.value()).entity(clinicServiceResponse).build();
     }
 
+    @GET
+    @Path("{id}/pets")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response getPetsByCustomer(@PathParam("id") Long id) {
+        ClinicServiceResponse clinicServiceResponse = new ClinicServiceResponse();
+        clinicServiceResponse.setMessage("successfully");
+        clinicServiceResponse.setStatus("OK");
+
+        Optional<Customer> customerOptional = customerRepository.findById(id);
+        if(!customerOptional.isPresent()) {
+            clinicServiceResponse.setMessage("error");
+            clinicServiceResponse.setStatus("ERR");
+
+            return Response.status(HttpStatus.NOT_FOUND.value()).entity(clinicServiceResponse).build();
+        }
+
+        Customer customer = customerOptional.get();
+
+        List<Pet> allByCustomer = petRepository.findAllByCustomer(customer);
+
+        clinicServiceResponse.setPets(allByCustomer);
+
+        return Response.status(HttpStatus.OK.value()).entity(clinicServiceResponse).build();
+    }
 }

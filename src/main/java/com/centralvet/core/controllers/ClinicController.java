@@ -92,4 +92,29 @@ public class ClinicController {
         return Response.status(HttpStatus.OK.value()).entity(clinicServiceResponse).build();
     }
 
+
+    @GET
+    @Path("{id}/customers")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response getCustomersForClinic(@PathParam("id") Long id) {
+        ClinicServiceResponse clinicServiceResponse = new ClinicServiceResponse();
+        clinicServiceResponse.setMessage("successfully");
+        clinicServiceResponse.setStatus("OK");
+
+        Optional<Clinic> clinicOptional = clinicRepository.findById(id);
+        if(!clinicOptional.isPresent()) {
+            clinicServiceResponse.setMessage("error");
+            clinicServiceResponse.setStatus("ERR");
+
+            return Response.status(HttpStatus.NOT_FOUND.value()).entity(clinicServiceResponse).build();
+        }
+
+        List<Customer> allByClinic = customerRepository.findAllByClinic(clinicOptional.get());
+
+        clinicServiceResponse.setCustomers(allByClinic);
+
+        return Response.status(HttpStatus.OK.value()).entity(clinicServiceResponse).build();
+
+    }
 }

@@ -8,6 +8,7 @@ import com.centralvet.core.request.ClinicRequest;
 import com.centralvet.core.request.CustomerRequest;
 import com.centralvet.core.response.ClinicServiceResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,12 +31,24 @@ public class ClinicController {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public ClinicServiceResponse getClinics() {
+    public ClinicServiceResponse getClinics(
+            @QueryParam("page") @DefaultValue("0") Integer page,
+            @QueryParam("size") @DefaultValue("10") Integer size,
+            @QueryParam("name") String name) {
+
         ClinicServiceResponse clinicServiceResponse = new ClinicServiceResponse();
         clinicServiceResponse.setMessage("successfully");
         clinicServiceResponse.setStatus("OK");
 
-        List<Clinic> clinics = (List<Clinic>) clinicRepository.findAll();
+        final Clinic exampleClinic = new Clinic();
+        exampleClinic.setName(name);
+        ExampleMatcher matcher = ExampleMatcher.matching()
+                .withIgnoreCase()
+                .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
+        Example example = Example.of(exampleClinic, matcher);
+
+        Pageable pageable = PageRequest.of(page, size);
+        List<Clinic> clinics = clinicRepository.findAll(example, pageable);
 
         //FIXME use getter
         clinicServiceResponse.setClinics(clinics);

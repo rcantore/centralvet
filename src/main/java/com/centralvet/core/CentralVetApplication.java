@@ -1,6 +1,6 @@
 package com.centralvet.core;
 
-import com.centralvet.core.conf.DataLoader;
+import com.centralvet.core.config.DataLoader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;

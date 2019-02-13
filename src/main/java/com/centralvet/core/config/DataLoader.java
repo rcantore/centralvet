@@ -1,4 +1,4 @@
-package com.centralvet.core.conf;
+package com.centralvet.core.config;
 
 import com.centralvet.core.entities.Clinic;
 import com.centralvet.core.entities.Customer;

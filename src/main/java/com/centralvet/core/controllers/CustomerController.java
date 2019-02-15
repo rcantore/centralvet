@@ -116,6 +116,7 @@ public class CustomerController {
 
         final Pet examplePet = new Pet();
         examplePet.setName(name);
+        examplePet.setCustomer(customer);
         ExampleMatcher matcher = ExampleMatcher.matching()
                 .withIgnoreCase()
                 .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
@@ -123,7 +124,7 @@ public class CustomerController {
 
         Pageable pageable = PageRequest.of(page, size);
 
-        Page<Pet> allByCustomer = petRepository.findAllByCustomer(customer, example, pageable);
+        Page<Pet> allByCustomer = petRepository.findAll(example, pageable);
 
         clinicServiceResponse.setPets(allByCustomer.getContent());
 

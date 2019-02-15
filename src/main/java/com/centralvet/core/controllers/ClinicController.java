@@ -7,6 +7,7 @@ import com.centralvet.core.entities.repositories.CustomerRepository;
 import com.centralvet.core.request.ClinicRequest;
 import com.centralvet.core.request.CustomerRequest;
 import com.centralvet.core.response.ClinicServiceResponse;
+import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
@@ -19,6 +20,8 @@ import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.Optional;
 
+
+@Api("Clinics API")
 @Service
 @Path("/api/clinics")
 public class ClinicController {
@@ -48,10 +51,10 @@ public class ClinicController {
         Example example = Example.of(exampleClinic, matcher);
 
         Pageable pageable = PageRequest.of(page, size);
-        List<Clinic> clinics = clinicRepository.findAll(example, pageable);
+        Page<Clinic> clinics = clinicRepository.findAll(example, pageable);
 
         //FIXME use getter
-        clinicServiceResponse.setClinics(clinics);
+        clinicServiceResponse.setClinics(clinics.getContent());
 
         return clinicServiceResponse;
     }

@@ -9,6 +9,7 @@ import com.centralvet.core.entities.repositories.PetRepository;
 import com.centralvet.core.request.PetRequest;
 import com.centralvet.core.response.ClinicServiceResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -33,15 +34,28 @@ public class CustomerController {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public ClinicServiceResponse getCustomers() {
+    public ClinicServiceResponse getCustomers(
+        @QueryParam("page") @DefaultValue("0") Integer page,
+        @QueryParam("size") @DefaultValue("10") Integer size,
+        @QueryParam("name") String name) {
+
         ClinicServiceResponse clinicServiceResponse = new ClinicServiceResponse();
         clinicServiceResponse.setMessage("successfully");
         clinicServiceResponse.setStatus("OK");
 
-        List<Customer> customers = (List<Customer>) customerRepository.findAll();
+        final Customer exampleCustomer = new Customer();
+        exampleCustomer.setName(name);
+        ExampleMatcher matcher = ExampleMatcher.matching()
+                .withIgnoreCase()
+                .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
+        Example example = Example.of(exampleCustomer, matcher);
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<Customer> customers = customerRepository.findAll(example, pageable);
 
         //FIXME use getter
-        clinicServiceResponse.setCustomers(customers);
+        clinicServiceResponse.setCustomers(customers.getContent());
 
         return clinicServiceResponse;
     }
@@ -82,7 +96,10 @@ public class CustomerController {
     @Path("{id}/pets")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response getPetsByCustomer(@PathParam("id") Long id) {
+    public Response getPetsByCustomer(@PathParam("id") Long id,
+                                      @QueryParam("page") @DefaultValue("0") Integer page,
+                                      @QueryParam("size") @DefaultValue("10") Integer size,
+                                      @QueryParam("name") String name) {
         ClinicServiceResponse clinicServiceResponse = new ClinicServiceResponse();
         clinicServiceResponse.setMessage("successfully");
         clinicServiceResponse.setStatus("OK");
@@ -97,9 +114,18 @@ public class CustomerController {
 
         Customer customer = customerOptional.get();
 
-        List<Pet> allByCustomer = petRepository.findAllByCustomer(customer);
+        final Pet examplePet = new Pet();
+        examplePet.setName(name);
+        ExampleMatcher matcher = ExampleMatcher.matching()
+                .withIgnoreCase()
+                .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
+        Example example = Example.of(examplePet, matcher);
 
-        clinicServiceResponse.setPets(allByCustomer);
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<Pet> allByCustomer = petRepository.findAllByCustomer(customer, example, pageable);
+
+        clinicServiceResponse.setPets(allByCustomer.getContent());
 
         return Response.status(HttpStatus.OK.value()).entity(clinicServiceResponse).build();
     }

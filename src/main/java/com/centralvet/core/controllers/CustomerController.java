@@ -1,6 +1,5 @@
 package com.centralvet.core.controllers;
 
-import com.centralvet.core.entities.Clinic;
 import com.centralvet.core.entities.Customer;
 import com.centralvet.core.entities.Pet;
 import com.centralvet.core.entities.repositories.ClinicRepository;
@@ -16,7 +15,6 @@ import org.springframework.stereotype.Service;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.List;
 import java.util.Optional;
 
 @Service

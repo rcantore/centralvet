@@ -7,18 +7,18 @@ Java > 1.8
 
 
 ### API Endpoints
-https://centralvet.herokuapp.com/api/customers/4/pets?name=chi
+https://localhost:8080/api/customers/4/pets?name=chi
 
-GET https://centralvet.herokuapp.com/api/clinics
+GET https://localhost:8080/api/clinics
 
-POST https://centralvet.herokuapp.com/api/clinics
+POST https://localhost:8080/api/clinics
 
-GET https://centralvet.herokuapp.com/api/clinics/{id}/customers
+GET https://localhost:8080m/api/clinics/{id}/customers
 
-POST https://centralvet.herokuapp.com/api/clinics/{id}/customers
+POST https://localhost:8080/api/clinics/{id}/customers
 
-GET https://centralvet.herokuapp.com/api/customers
+GET https://localhost:8080/api/customers
 
-POST https://centralvet.herokuapp.com/api/customers/{id}/pets
+POST https://localhost:8080/api/customers/{id}/pets
 
-GET https://centralvet.herokuapp.com/api/customers/{id}/pets
+GET https://localhost:8080/api/customers/{id}/pets

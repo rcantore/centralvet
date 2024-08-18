@@ -8,11 +8,17 @@ import com.centralvet.core.request.ClinicRequest;
 import com.centralvet.core.request.CustomerRequest;
 import com.centralvet.core.response.ClinicServiceResponse;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -21,19 +27,21 @@ import java.util.List;
 import java.util.Optional;
 
 
-@Api("Clinics API")
-@Service
-@Path("/api/clinics")
+@OpenAPIDefinition
+@RestController
+@RequestMapping("/api/clinics")
 public class ClinicController {
-
-    @Autowired
-    ClinicRepository clinicRepository;
+    private final ClinicRepository clinicRepository;
 
     @Autowired
     CustomerRepository customerRepository;
 
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
+    public ClinicController(ClinicRepository clinicRepository) {
+        this.clinicRepository = clinicRepository;
+    }
+
+    @Operation(summary = "Get all clinics")
+    @GetMapping
     public ClinicServiceResponse getClinics(
             @QueryParam("page") @DefaultValue("0") Integer page,
             @QueryParam("size") @DefaultValue("10") Integer size,
@@ -48,7 +56,7 @@ public class ClinicController {
         ExampleMatcher matcher = ExampleMatcher.matching()
                 .withIgnoreCase()
                 .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
-        Example example = Example.of(exampleClinic, matcher);
+        Example<Clinic> example = Example.of(exampleClinic, matcher);
 
         Pageable pageable = PageRequest.of(page, size);
         Page<Clinic> clinics = clinicRepository.findAll(example, pageable);

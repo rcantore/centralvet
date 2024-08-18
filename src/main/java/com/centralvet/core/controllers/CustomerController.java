@@ -7,6 +7,8 @@ import com.centralvet.core.entities.repositories.CustomerRepository;
 import com.centralvet.core.entities.repositories.PetRepository;
 import com.centralvet.core.request.PetRequest;
 import com.centralvet.core.response.ClinicServiceResponse;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
@@ -19,6 +21,7 @@ import java.util.Optional;
 
 @Service
 @Path("/api/customers")
+@Api("Customers API")
 public class CustomerController {
 
     @Autowired
@@ -32,6 +35,7 @@ public class CustomerController {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation("Get all customers")
     public ClinicServiceResponse getCustomers(
         @QueryParam("page") @DefaultValue("0") Integer page,
         @QueryParam("size") @DefaultValue("10") Integer size,
@@ -62,6 +66,7 @@ public class CustomerController {
     @Path("{id}/pets")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
+    @ApiOperation("Add a pet to a customer")
     public Response postPetToCustomer(PetRequest body, @PathParam("id") Long id) {
         ClinicServiceResponse clinicServiceResponse = new ClinicServiceResponse();
         clinicServiceResponse.setMessage("successfully");
@@ -94,6 +99,7 @@ public class CustomerController {
     @Path("{id}/pets")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
+    @ApiOperation("Get pets by customer")
     public Response getPetsByCustomer(@PathParam("id") Long id,
                                       @QueryParam("page") @DefaultValue("0") Integer page,
                                       @QueryParam("size") @DefaultValue("10") Integer size,

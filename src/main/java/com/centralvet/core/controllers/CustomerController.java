@@ -7,35 +7,38 @@ import com.centralvet.core.entities.repositories.CustomerRepository;
 import com.centralvet.core.entities.repositories.PetRepository;
 import com.centralvet.core.request.PetRequest;
 import com.centralvet.core.response.ClinicServiceResponse;
-import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.beans.factory.annotation.Autowired;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Optional;
 
-@Service
-@Path("/api/customers")
-@Api("Customers API")
+@OpenAPIDefinition
+@RestController
+@RequestMapping("/api/customers")
 public class CustomerController {
+    private final ClinicRepository clinicRepository;
 
-    @Autowired
-    ClinicRepository clinicRepository;
+    private final CustomerRepository customerRepository;
 
-    @Autowired
-    CustomerRepository customerRepository;
+    private final PetRepository petRepository;
 
-    @Autowired
-    PetRepository petRepository;
+    public CustomerController(ClinicRepository clinicRepository, CustomerRepository customerRepository, PetRepository petRepository) {
+        this.clinicRepository = clinicRepository;
+        this.customerRepository = customerRepository;
+        this.petRepository = petRepository;
+    }
 
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation("Get all customers")
+    @Operation(summary = "Get all customers")
+    @GetMapping
     public ClinicServiceResponse getCustomers(
         @QueryParam("page") @DefaultValue("0") Integer page,
         @QueryParam("size") @DefaultValue("10") Integer size,

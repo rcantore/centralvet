@@ -7,18 +7,12 @@ import com.centralvet.core.entities.repositories.CustomerRepository;
 import com.centralvet.core.request.ClinicRequest;
 import com.centralvet.core.request.CustomerRequest;
 import com.centralvet.core.response.ClinicServiceResponse;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -33,11 +27,11 @@ import java.util.Optional;
 public class ClinicController {
     private final ClinicRepository clinicRepository;
 
-    @Autowired
-    CustomerRepository customerRepository;
+    private final CustomerRepository customerRepository;
 
-    public ClinicController(ClinicRepository clinicRepository) {
+    public ClinicController(ClinicRepository clinicRepository, CustomerRepository customerRepository) {
         this.clinicRepository = clinicRepository;
+        this.customerRepository = customerRepository;
     }
 
     @Operation(summary = "Get all clinics")
@@ -67,9 +61,10 @@ public class ClinicController {
         return clinicServiceResponse;
     }
 
-    @POST
+    @Operation(summary = "Create a new clinic")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
+    @PostMapping
     public ClinicServiceResponse postClinic(@RequestBody ClinicRequest body) {
         ClinicServiceResponse clinicServiceResponse = new ClinicServiceResponse();
         clinicServiceResponse.setMessage("successfully");
@@ -84,11 +79,10 @@ public class ClinicController {
         return clinicServiceResponse;
     }
 
-    @POST
-    @Path("{id}/customers")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response postCostumerToClinic(CustomerRequest body, @PathParam("id") Long id) {
+    @PostMapping("/{id}/customers")
+    public Response postCostumerToClinic(CustomerRequest body, @PathVariable Long id) {
         ClinicServiceResponse clinicServiceResponse = new ClinicServiceResponse();
         clinicServiceResponse.setMessage("successfully");
         clinicServiceResponse.setStatus("OK");
@@ -117,17 +111,17 @@ public class ClinicController {
     }
 
 
-    @GET
-    @Path("{id}/customers")
+    @Operation(summary = "Get customers by clinic")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response getCustomersForClinic(@PathParam("id") Long id) {
+    @GetMapping("/{id}/customers")
+    public Response getCustomersForClinic(@PathVariable("id") Long id) {
         ClinicServiceResponse clinicServiceResponse = new ClinicServiceResponse();
         clinicServiceResponse.setMessage("successfully");
         clinicServiceResponse.setStatus("OK");
 
         Optional<Clinic> clinicOptional = clinicRepository.findById(id);
-        if(!clinicOptional.isPresent()) {
+        if(clinicOptional.isEmpty()) {
             clinicServiceResponse.setMessage("error");
             clinicServiceResponse.setStatus("ERR");
 

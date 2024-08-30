@@ -3,6 +3,7 @@ package com.centralvet.core.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -15,8 +16,8 @@ public class Customer extends AbstractEntity {
     @JsonIgnore
     Clinic clinic;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    List<Pet> pets;
+    @OneToMany
+    List<Pet> pets = new ArrayList<>();
 
     public String getName() {
         return name;

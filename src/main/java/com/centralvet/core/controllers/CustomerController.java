@@ -6,7 +6,7 @@ import com.centralvet.core.entities.repositories.ClinicRepository;
 import com.centralvet.core.entities.repositories.CustomerRepository;
 import com.centralvet.core.entities.repositories.PetRepository;
 import com.centralvet.core.request.PetRequest;
-import com.centralvet.core.response.ClinicServiceResponse;
+import com.centralvet.core.response.ClinicsResponse;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
@@ -39,14 +39,15 @@ public class CustomerController {
 
     @Operation(summary = "Get all customers")
     @GetMapping
-    public ClinicServiceResponse getCustomers(
+    public ClinicsResponse getCustomers(
         @QueryParam("page") @DefaultValue("0") Integer page,
         @QueryParam("size") @DefaultValue("10") Integer size,
         @QueryParam("name") String name) {
+        //fixme use a different response object
 
-        ClinicServiceResponse clinicServiceResponse = new ClinicServiceResponse();
-        clinicServiceResponse.setMessage("successfully");
-        clinicServiceResponse.setStatus("OK");
+        ClinicsResponse clinicsResponse = new ClinicsResponse();
+        clinicsResponse.setMessage("successfully");
+        clinicsResponse.setStatus("OK");
 
         final Customer exampleCustomer = new Customer();
         exampleCustomer.setName(name);
@@ -60,9 +61,9 @@ public class CustomerController {
         Page<Customer> customers = customerRepository.findAll(example, pageable);
 
         //FIXME use getter
-        clinicServiceResponse.setCustomers(customers.getContent());
+        //clinicsResponse.setCustomers(customers.getContent());
 
-        return clinicServiceResponse;
+        return clinicsResponse;
     }
 
     @POST
@@ -71,16 +72,16 @@ public class CustomerController {
     @Consumes(MediaType.APPLICATION_JSON)
     @ApiOperation("Add a pet to a customer")
     public Response postPetToCustomer(PetRequest body, @PathParam("id") Long id) {
-        ClinicServiceResponse clinicServiceResponse = new ClinicServiceResponse();
-        clinicServiceResponse.setMessage("successfully");
-        clinicServiceResponse.setStatus("OK");
+        ClinicsResponse clinicsResponse = new ClinicsResponse();
+        clinicsResponse.setMessage("successfully");
+        clinicsResponse.setStatus("OK");
 
         Optional<Customer> customerOptional = customerRepository.findById(id);
         if(!customerOptional.isPresent()) {
-            clinicServiceResponse.setMessage("error");
-            clinicServiceResponse.setStatus("ERR");
+            clinicsResponse.setMessage("error");
+            clinicsResponse.setStatus("ERR");
 
-            return Response.status(HttpStatus.NOT_FOUND.value()).entity(clinicServiceResponse).build();
+            return Response.status(HttpStatus.NOT_FOUND.value()).entity(clinicsResponse).build();
         }
 
         Customer customer = customerOptional.get();
@@ -95,7 +96,7 @@ public class CustomerController {
         customer.getPets().add(savedPet);
         customerRepository.save(customer);
 
-        return Response.status(HttpStatus.OK.value()).entity(clinicServiceResponse).build();
+        return Response.status(HttpStatus.OK.value()).entity(clinicsResponse).build();
     }
 
     @GET
@@ -107,16 +108,17 @@ public class CustomerController {
                                       @QueryParam("page") @DefaultValue("0") Integer page,
                                       @QueryParam("size") @DefaultValue("10") Integer size,
                                       @QueryParam("name") String name) {
-        ClinicServiceResponse clinicServiceResponse = new ClinicServiceResponse();
-        clinicServiceResponse.setMessage("successfully");
-        clinicServiceResponse.setStatus("OK");
+        //FIXME use a different response object
+        ClinicsResponse clinicsResponse = new ClinicsResponse();
+        clinicsResponse.setMessage("successfully");
+        clinicsResponse.setStatus("OK");
 
         Optional<Customer> customerOptional = customerRepository.findById(id);
         if(!customerOptional.isPresent()) {
-            clinicServiceResponse.setMessage("error");
-            clinicServiceResponse.setStatus("ERR");
+            clinicsResponse.setMessage("error");
+            clinicsResponse.setStatus("ERR");
 
-            return Response.status(HttpStatus.NOT_FOUND.value()).entity(clinicServiceResponse).build();
+            return Response.status(HttpStatus.NOT_FOUND.value()).entity(clinicsResponse).build();
         }
 
         Customer customer = customerOptional.get();
@@ -133,8 +135,8 @@ public class CustomerController {
 
         Page<Pet> allByCustomer = petRepository.findAll(example, pageable);
 
-        clinicServiceResponse.setPets(allByCustomer.getContent());
+        //clinicsResponse.setPets(allByCustomer.getContent());
 
-        return Response.status(HttpStatus.OK.value()).entity(clinicServiceResponse).build();
+        return Response.status(HttpStatus.OK.value()).entity(clinicsResponse).build();
     }
 }

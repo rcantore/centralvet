@@ -4,6 +4,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -13,8 +14,8 @@ public class Clinic extends AbstractEntity {
     String address;
 
     //assumed super loyal customers
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    List<Customer> customers;
+    @OneToMany(cascade = CascadeType.ALL)
+    List<Customer> customers = new ArrayList<>();
 
     public List<Customer> getCustomers() {
         return customers;

@@ -6,10 +6,10 @@ import com.centralvet.core.entities.repositories.ClinicRepository;
 import com.centralvet.core.entities.repositories.CustomerRepository;
 import com.centralvet.core.request.ClinicRequest;
 import com.centralvet.core.request.CustomerRequest;
-import com.centralvet.core.response.ClinicServiceResponse;
+import com.centralvet.core.response.ClinicResponse;
+import com.centralvet.core.response.ClinicsResponse;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.Operation;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -36,63 +36,55 @@ public class ClinicController {
 
     @Operation(summary = "Get all clinics")
     @GetMapping
-    public ClinicServiceResponse getClinics(
-            @QueryParam("page") @DefaultValue("0") Integer page,
-            @QueryParam("size") @DefaultValue("10") Integer size,
-            @QueryParam("name") String name) {
+    public ClinicsResponse getClinics(
+            @RequestParam(name = "page", defaultValue = "0") Integer page,
+            @RequestParam(name = "size", defaultValue = "10") Integer size) {
 
-        ClinicServiceResponse clinicServiceResponse = new ClinicServiceResponse();
-        clinicServiceResponse.setMessage("successfully");
-        clinicServiceResponse.setStatus("OK");
+        ClinicsResponse clinicsResponse = new ClinicsResponse();
+        clinicsResponse.setMessage("successfully");
+        clinicsResponse.setStatus("OK");
 
-        final Clinic exampleClinic = new Clinic();
-        exampleClinic.setName(name);
-        ExampleMatcher matcher = ExampleMatcher.matching()
-                .withIgnoreCase()
-                .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);
-        Example<Clinic> example = Example.of(exampleClinic, matcher);
 
         Pageable pageable = PageRequest.of(page, size);
-        Page<Clinic> clinics = clinicRepository.findAll(example, pageable);
+        Page<Clinic> clinics = clinicRepository.findAll(pageable);
 
-        //FIXME use getter
-        clinicServiceResponse.setClinics(clinics.getContent());
+        clinicsResponse.setClinics(clinics.getContent());
 
-        return clinicServiceResponse;
+        return clinicsResponse;
     }
 
     @Operation(summary = "Create a new clinic")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @PostMapping
-    public ClinicServiceResponse postClinic(@RequestBody ClinicRequest body) {
-        ClinicServiceResponse clinicServiceResponse = new ClinicServiceResponse();
-        clinicServiceResponse.setMessage("successfully");
-        clinicServiceResponse.setStatus("OK");
+    public ClinicsResponse postClinic(@RequestBody ClinicRequest body) {
+        ClinicsResponse clinicsResponse = new ClinicsResponse();
+        clinicsResponse.setMessage("successfully");
+        clinicsResponse.setStatus("OK");
 
         Clinic clinic = new Clinic();
         clinic.setAddress(body.getAddress());
         clinic.setName(body.getName());
         Clinic savedClinic = clinicRepository.save(clinic);
-        clinicServiceResponse.getClinics().add(savedClinic);
+        clinicsResponse.getClinics().add(savedClinic);
 
-        return clinicServiceResponse;
+        return clinicsResponse;
     }
 
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     @PostMapping("/{id}/customers")
     public Response postCostumerToClinic(CustomerRequest body, @PathVariable Long id) {
-        ClinicServiceResponse clinicServiceResponse = new ClinicServiceResponse();
-        clinicServiceResponse.setMessage("successfully");
-        clinicServiceResponse.setStatus("OK");
+        ClinicsResponse clinicsResponse = new ClinicsResponse();
+        clinicsResponse.setMessage("successfully");
+        clinicsResponse.setStatus("OK");
 
         Optional<Clinic> clinicOptional = clinicRepository.findById(id);
         if(!clinicOptional.isPresent()) {
-            clinicServiceResponse.setMessage("error");
-            clinicServiceResponse.setStatus("ERR");
+            clinicsResponse.setMessage("error");
+            clinicsResponse.setStatus("ERR");
 
-            return Response.status(HttpStatus.NOT_FOUND.value()).entity(clinicServiceResponse).build();
+            return Response.status(HttpStatus.NOT_FOUND.value()).entity(clinicsResponse).build();
         }
 
         Clinic clinic = clinicOptional.get();
@@ -107,7 +99,7 @@ public class ClinicController {
         clinic.getCustomers().add(savedCustomer);
         clinicRepository.save(clinic);
 
-        return Response.status(HttpStatus.OK.value()).entity(clinicServiceResponse).build();
+        return Response.status(HttpStatus.OK.value()).entity(clinicsResponse).build();
     }
 
 
@@ -116,23 +108,23 @@ public class ClinicController {
     @Consumes(MediaType.APPLICATION_JSON)
     @GetMapping("/{id}/customers")
     public Response getCustomersForClinic(@PathVariable("id") Long id) {
-        ClinicServiceResponse clinicServiceResponse = new ClinicServiceResponse();
-        clinicServiceResponse.setMessage("successfully");
-        clinicServiceResponse.setStatus("OK");
+        ClinicResponse clinicResponse = new ClinicResponse();
+        clinicResponse.setMessage("successfully");
+        clinicResponse.setStatus("OK");
 
         Optional<Clinic> clinicOptional = clinicRepository.findById(id);
         if(clinicOptional.isEmpty()) {
-            clinicServiceResponse.setMessage("error");
-            clinicServiceResponse.setStatus("ERR");
+            clinicResponse.setMessage("error");
+            clinicResponse.setStatus("ERR");
 
-            return Response.status(HttpStatus.NOT_FOUND.value()).entity(clinicServiceResponse).build();
+            return Response.status(HttpStatus.NOT_FOUND.value()).entity(clinicResponse).build();
         }
 
         List<Customer> allByClinic = customerRepository.findAllByClinic(clinicOptional.get());
 
-        clinicServiceResponse.setCustomers(allByClinic);
+        clinicResponse.setCustomers(allByClinic);
 
-        return Response.status(HttpStatus.OK.value()).entity(clinicServiceResponse).build();
+        return Response.status(HttpStatus.OK.value()).entity(clinicResponse).build();
 
     }
 }

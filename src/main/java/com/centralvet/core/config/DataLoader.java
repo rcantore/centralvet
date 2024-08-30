@@ -8,11 +8,14 @@ import com.centralvet.core.entities.repositories.CustomerRepository;
 import com.centralvet.core.entities.repositories.PetRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 
 @Component
+@Transactional(propagation = Propagation.REQUIRED)
 public class DataLoader {
 
     private ClinicRepository clinicRepository;
@@ -28,6 +31,7 @@ public class DataLoader {
         this.petRepository = petRepository;
     }
 
+    @Transactional(propagation = Propagation.REQUIRED)
     public void loadData() {
         loadClinics();
         loadCustomers();
@@ -37,7 +41,7 @@ public class DataLoader {
     public void loadClinics() {
         List<Clinic> clinics = (List<Clinic>) clinicRepository.findAll();
 
-        if (clinics.size() == 0) {
+        if (clinics.isEmpty()) {
             Clinic clinic = new Clinic();
             clinic.setAddress("Fake address 123");
             clinic.setName("Pet's Ahoy");
@@ -55,9 +59,10 @@ public class DataLoader {
 
     }
 
+    @Transactional(propagation = Propagation.REQUIRED)
     public void loadCustomers() {
         List<Customer> customers = (List<Customer>) customerRepository.findAll();
-        if(customers.size() == 0) {
+        if (customers.isEmpty()) {
             addCustomerToClinic("Willowtree", "Anibal Smith", 1L, 1L);
             addCustomerToClinic("Sleepy Hollow", "Jane Depp", 2L, 1L);
             addCustomerToClinic("SFo FOO", "Christoph Polopolopus", 3L, 1L);
@@ -73,7 +78,8 @@ public class DataLoader {
 
     }
 
-    private void addCustomerToClinic(String address, String name, long customerId, long clinicId) {
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void addCustomerToClinic(String address, String name, long customerId, long clinicId) {
         Optional<Clinic> clinicOptional = clinicRepository.findById(clinicId);
 
         Customer customer = new Customer();
@@ -89,9 +95,10 @@ public class DataLoader {
         clinicRepository.save(clinic);
     }
 
+    @Transactional(propagation = Propagation.REQUIRED)
     public void loadPets() {
         List<Pet> pets = (List<Pet>) petRepository.findAll();
-        if(pets.size() == 0) {
+        if (pets.isEmpty()) {
             addNewPetToCustomer("Chihuahua", "Pepe", 1L);
             addNewPetToCustomer("Siamese", "Gordian", 1L);
 
@@ -126,7 +133,8 @@ public class DataLoader {
 
     }
 
-    private Customer addNewPetToCustomer(String breed, String name, long customerId) {
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void addNewPetToCustomer(String breed, String name, long customerId) {
         Optional<Customer> optionalCustomer = customerRepository.findById(customerId);
 
         Pet pet = new Pet();
@@ -136,8 +144,7 @@ public class DataLoader {
         Customer customer = optionalCustomer.orElse(new Customer());
         pet.setCustomer(customer);
 
-        customer.getPets().add(pet);
+        customer.getPets().add(petRepository.save(pet));
         customerRepository.save(customer);
-        return customer;
     }
 }

@@ -26,4 +26,8 @@ public class ClienteService {
     public List<Mascota> getMascotasByCliente(Long clienteId) {
         return mascotaRepository.findByClienteId(clienteId);
     }
+
+    public Cliente createCliente(Cliente cliente) {
+        return clienteRepository.save(cliente);
+    }
 }
